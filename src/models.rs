@@ -8,9 +8,10 @@ use serde::{Deserialize, Serialize};
 pub struct OsVersion {
     pub name: Option<String>,
     pub version: Option<String>,
-    pub major: Option<i64>,
-    pub minor: Option<i64>,
-    pub patch: Option<i64>,
+    // On Windows these are returned as strings, so keep them as String for compatibility
+    pub major: Option<String>,
+    pub minor: Option<String>,
+    pub patch: Option<String>,
     pub build: Option<String>,
     pub platform: Option<String>,
     #[serde(rename = "platform_like")]
@@ -29,14 +30,16 @@ pub struct SystemDetails {
     pub cpu_subtype: Option<String>,
     #[serde(rename = "cpu_brand")]
     pub cpu_brand: Option<String>,
+    // On Windows these core counts are strings in osquery JSON
     #[serde(rename = "cpu_physical_cores")]
-    pub cpu_physical_cores: Option<i64>,
+    pub cpu_physical_cores: Option<String>,
     #[serde(rename = "cpu_logical_cores")]
-    pub cpu_logical_cores: Option<i64>,
+    pub cpu_logical_cores: Option<String>,
     #[serde(rename = "cpu_microcode")]
     pub cpu_microcode: Option<String>,
+    // On Windows this is also a string representing bytes
     #[serde(rename = "physical_memory")]
-    pub physical_memory: Option<i64>,
+    pub physical_memory: Option<String>,
     #[serde(rename = "hardware_vendor")]
     pub hardware_vendor: Option<String>,
     #[serde(rename = "hardware_model")]
@@ -51,43 +54,19 @@ pub struct SystemDetails {
     pub local_hostname: Option<String>,
 }
 
+// NOTE: Windows `processes` table returns most numeric-looking fields as strings.
+// To maximize compatibility and avoid deserialization failures, we only model
+// a small, schema-tolerant subset as strings.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ProcessInfo {
-    pub pid: Option<i64>,
+    /// Process ID (often returned as a string by osquery on Windows)
+    pub pid: Option<String>,
     pub name: Option<String>,
     pub path: Option<String>,
     pub cmdline: Option<String>,
     pub state: Option<String>,
-    pub cwd: Option<String>,
-    pub root: Option<String>,
-    pub uid: Option<i64>,
-    pub gid: Option<i64>,
-    pub euid: Option<i64>,
-    pub egid: Option<i64>,
-    pub suid: Option<i64>,
-    pub sgid: Option<i64>,
-    #[serde(rename = "on_disk")]
-    pub on_disk: Option<i64>,
-    #[serde(rename = "wired_size")]
-    pub wired_size: Option<i64>,
-    #[serde(rename = "resident_size")]
-    pub resident_size: Option<i64>,
-    #[serde(rename = "total_size")]
-    pub total_size: Option<i64>,
-    #[serde(rename = "user_time")]
-    pub user_time: Option<i64>,
-    #[serde(rename = "system_time")]
-    pub system_time: Option<i64>,
-    #[serde(rename = "disk_bytes_read")]
-    pub disk_bytes_read: Option<i64>,
-    #[serde(rename = "disk_bytes_written")]
-    pub disk_bytes_written: Option<i64>,
-    #[serde(rename = "start_time")]
-    pub start_time: Option<i64>,
-    pub parent: Option<i64>,
-    pub pgroup: Option<i64>,
-    pub threads: Option<i64>,
-    pub nice: Option<i64>,
+    /// Parent PID
+    pub parent: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

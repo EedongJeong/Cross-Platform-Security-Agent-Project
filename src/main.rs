@@ -35,13 +35,25 @@ fn main() {
         println!("System Info:");
         println!("  Hostname: {:?}", sys_info.hostname);
         println!("  CPU Brand: {:?}", sys_info.cpu_brand);
-        if let Some(mem) = sys_info.physical_memory {
-            println!("  Physical Memory: {} bytes ({:.2} GB)", mem, mem as f64 / 1_000_000_000.0);
+
+        if let Some(mem_str) = &sys_info.physical_memory {
+            if let Ok(bytes) = mem_str.parse::<f64>() {
+                println!(
+                    "  Physical Memory: {} bytes ({:.2} GB)",
+                    mem_str,
+                    bytes / 1_000_000_000.0
+                );
+            } else {
+                println!("  Physical Memory: {} bytes (parse error)", mem_str);
+            }
         } else {
             println!("  Physical Memory: Not available");
         }
-        println!("  CPU Cores (Physical/Logical): {:?}/{:?}", 
-                 sys_info.cpu_physical_cores, sys_info.cpu_logical_cores);
+
+        println!(
+            "  CPU Cores (Physical/Logical): {:?}/{:?}",
+            sys_info.cpu_physical_cores, sys_info.cpu_logical_cores
+        );
         println!();
     } else {
         println!("System Info: Not available\n");

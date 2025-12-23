@@ -67,7 +67,10 @@ fn find_osquery_binary() -> String {
 /// Executes an OSquery query and returns JSON result
 pub fn execute_osquery_query(query: &str) -> Result<Vec<Value>> {
     let osquery_path = find_osquery_binary();
-    
+
+    // Basic debug output so we can see which binary and query are used
+    eprintln!("[osquery] Executing '{}' using binary '{}'", query, osquery_path);
+
     let output = Command::new(&osquery_path)
         .arg("--json")
         .arg(query)
@@ -76,6 +79,7 @@ pub fn execute_osquery_query(query: &str) -> Result<Vec<Value>> {
 
     if !output.status.success() {
         let error_msg = String::from_utf8_lossy(&output.stderr);
+        eprintln!("[osquery] Query failed. stderr: {}", error_msg);
         return Err(anyhow::anyhow!("OSquery query failed: {}", error_msg));
     }
 
@@ -91,13 +95,29 @@ pub fn query_to_struct<T>(query: &str) -> Result<Vec<T>>
 where
     T: for<'de> Deserialize<'de>,
 {
-    let json_values = execute_osquery_query(query)?;
+    let json_values = match execute_osquery_query(query) {
+        Ok(values) => values,
+        Err(e) => {
+            eprintln!("[osquery] Error executing query '{}': {:?}", query, e);
+            return Err(e);
+        }
+    };
+
     let mut results = Vec::new();
     
     for value in json_values {
-        let parsed: T = serde_json::from_value(value)
-            .context("Failed to deserialize OSquery result")?;
-        results.push(parsed);
+        match serde_json::from_value::<T>(value.clone()) {
+            Ok(parsed) => results.push(parsed),
+            Err(e) => {
+                eprintln!(
+                    "[osquery] Failed to deserialize OSquery result for query '{}': {:?}\n  Value: {}",
+                    query,
+                    e,
+                    value
+                );
+                // Skip this row but continue with others
+            }
+        }
     }
     
     Ok(results)

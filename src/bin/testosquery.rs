@@ -73,9 +73,13 @@ fn print_system_info(system_info: &SystemInfo) {
         if let Some(cpu_brand) = &sys_info.cpu_brand {
             println!("│ CPU Brand:   {:50} │", cpu_brand);
         }
-        if let Some(mem) = sys_info.physical_memory {
-            let mem_gb = mem as f64 / 1_073_741_824.0; // Convert to GB
-            println!("│ Memory:      {:47.2} GB │", mem_gb);
+        if let Some(mem_str) = &sys_info.physical_memory {
+            if let Ok(bytes) = mem_str.parse::<f64>() {
+                let mem_gb = bytes / 1_073_741_824.0; // Convert to GB
+                println!("│ Memory:      {:47.2} GB │", mem_gb);
+            } else {
+                println!("│ Memory:      {:47} (parse error) │", mem_str);
+            }
         }
         if let (Some(phys), Some(log)) = (sys_info.cpu_physical_cores, sys_info.cpu_logical_cores) {
             println!("│ CPU Cores:   {:25} (Physical/Logical) │", 
@@ -117,7 +121,7 @@ fn print_sample_data(system_info: &SystemInfo) {
         println!("│ Top 3 Processes:                                            │");
         for (i, proc) in system_info.processes.iter().take(3).enumerate() {
             let name = proc.name.as_deref().unwrap_or("Unknown");
-            let pid = proc.pid.map(|p| p.to_string()).unwrap_or_else(|| "N/A".to_string());
+            let pid = proc.pid.clone().unwrap_or_else(|| "N/A".to_string());
             println!("│   {}. {} (PID: {})", i + 1, 
                      truncate(name, 35), 
                      truncate(&pid, 10));

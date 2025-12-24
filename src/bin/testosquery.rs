@@ -81,7 +81,7 @@ fn print_system_info(system_info: &SystemInfo) {
                 println!("│ Memory:      {:47} (parse error) │", mem_str);
             }
         }
-        if let (Some(phys), Some(log)) = (sys_info.cpu_physical_cores, sys_info.cpu_logical_cores) {
+        if let (Some(phys), Some(log)) = (&sys_info.cpu_physical_cores, &sys_info.cpu_logical_cores) {
             println!("│ CPU Cores:   {:25} (Physical/Logical) │", 
                      format!("{}/{}", phys, log));
         }
@@ -133,7 +133,7 @@ fn print_sample_data(system_info: &SystemInfo) {
     if !system_info.listening_ports.is_empty() {
         println!("│ Top 3 Listening Ports:                                     │");
         for (i, port) in system_info.listening_ports.iter().take(3).enumerate() {
-            let port_num = port.port.map(|p| p.to_string()).unwrap_or_else(|| "N/A".to_string());
+            let port_num = port.port.as_deref().unwrap_or("N/A");
             let address = port.address.as_deref().unwrap_or("N/A");
             println!("│   {}. {}:{}", i + 1, address, port_num);
         }
@@ -145,7 +145,7 @@ fn print_sample_data(system_info: &SystemInfo) {
         println!("│ Sample Users:                                               │");
         for (i, user) in system_info.users.iter().take(3).enumerate() {
             let username = user.username.as_deref().unwrap_or("Unknown");
-            let uid = user.uid.map(|u| u.to_string()).unwrap_or_else(|| "N/A".to_string());
+            let uid = user.uid.as_deref().unwrap_or("N/A");
             println!("│   {}. {} (UID: {})", i + 1, username, uid);
         }
     }

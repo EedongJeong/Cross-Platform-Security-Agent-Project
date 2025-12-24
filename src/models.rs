@@ -71,43 +71,46 @@ pub struct ProcessInfo {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct NetworkConnection {
-    pub pid: Option<i64>,
-    pub fd: Option<i64>,
-    pub socket: Option<i64>,
-    pub family: Option<i64>,
-    pub protocol: Option<i64>,
+    // On Windows, OSquery returns these as strings
+    pub pid: Option<String>,
+    pub fd: Option<String>,
+    pub socket: Option<String>,
+    pub family: Option<String>,
+    pub protocol: Option<String>,
     #[serde(rename = "local_address")]
     pub local_address: Option<String>,
     #[serde(rename = "local_port")]
-    pub local_port: Option<i64>,
+    pub local_port: Option<String>,
     #[serde(rename = "remote_address")]
     pub remote_address: Option<String>,
     #[serde(rename = "remote_port")]
-    pub remote_port: Option<i64>,
+    pub remote_port: Option<String>,
     pub state: Option<String>,
     pub path: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ListeningPort {
-    pub pid: Option<i64>,
-    pub port: Option<i64>,
-    pub protocol: Option<i64>,
-    pub family: Option<i64>,
+    // On Windows, OSquery returns these as strings
+    pub pid: Option<String>,
+    pub port: Option<String>,
+    pub protocol: Option<String>,
+    pub family: Option<String>,
     pub address: Option<String>,
-    pub fd: Option<i64>,
-    pub socket: Option<i64>,
+    pub fd: Option<String>,
+    pub socket: Option<String>,
     pub path: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct UserInfo {
-    pub uid: Option<i64>,
-    pub gid: Option<i64>,
+    // On Windows, OSquery returns these as strings
+    pub uid: Option<String>,
+    pub gid: Option<String>,
     #[serde(rename = "uid_signed")]
-    pub uid_signed: Option<i64>,
+    pub uid_signed: Option<String>,
     #[serde(rename = "gid_signed")]
-    pub gid_signed: Option<i64>,
+    pub gid_signed: Option<String>,
     pub username: Option<String>,
     pub description: Option<String>,
     pub directory: Option<String>,
@@ -115,8 +118,7 @@ pub struct UserInfo {
     pub uuid: Option<String>,
     #[serde(rename = "type")]
     pub type_: Option<String>,
-    #[serde(rename = "is_hidden")]
-    pub is_hidden: Option<i64>,
+    // Note: is_hidden field may not always be present on Windows
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -127,13 +129,14 @@ pub struct ServiceInfo {
     #[serde(rename = "display_name")]
     pub display_name: Option<String>,
     pub status: Option<String>,
-    pub pid: Option<i64>,
+    // On Windows, OSquery returns pid as string
+    pub pid: Option<String>,
     #[serde(rename = "start_type")]
     pub start_type: Option<String>,
     #[serde(rename = "win32_exit_code")]
-    pub win32_exit_code: Option<i64>,
+    pub win32_exit_code: Option<String>,
     #[serde(rename = "service_exit_code")]
-    pub service_exit_code: Option<i64>,
+    pub service_exit_code: Option<String>,
     pub path: Option<String>,
     #[serde(rename = "module_path")]
     pub module_path: Option<String>,
@@ -147,17 +150,18 @@ pub struct ScheduledTask {
     pub name: Option<String>,
     pub action: Option<String>,
     pub path: Option<String>,
-    pub enabled: Option<i64>,
+    // On Windows, OSquery returns these as strings
+    pub enabled: Option<String>,
     pub state: Option<String>,
-    pub hidden: Option<i64>,
+    pub hidden: Option<String>,
     #[serde(rename = "last_run_time")]
-    pub last_run_time: Option<i64>,
+    pub last_run_time: Option<String>,
     #[serde(rename = "next_run_time")]
-    pub next_run_time: Option<i64>,
+    pub next_run_time: Option<String>,
     #[serde(rename = "last_run_message")]
     pub last_run_message: Option<String>,
     #[serde(rename = "last_run_code")]
-    pub last_run_code: Option<i64>,
+    pub last_run_code: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
